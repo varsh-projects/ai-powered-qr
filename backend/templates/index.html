@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkShield AI — AI-Powered Malicious URL Detection</title>
+    <meta name="description" content="Analyze suspicious URLs and detect phishing or malware threats in real-time with LinkShield AI.">
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Top Navigation -->
+        <nav class="navbar" id="navbar">
+            <div class="container nav-container">
+                <a href="#hero" class="brand-link">
+                    <span class="brand-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="M9 12l2 2 4-4"/>
+                        </svg>
+                    </span>
+                    <span class="brand-text">LinkShield AI</span>
+                    <span class="brand-badge">SecOps</span>
+                </a>
+
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#scanner" class="nav-link">Scanner</a></li>
+                    <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+                    <li><a href="#about" class="nav-link">About</a></li>
+                    <li>
+                        <div class="status-pill" id="statusPill" title="Real-time backend API connectivity">
+                            <span class="status-dot" id="apiStatusDot"></span>
+                            <span id="apiStatusText">API: Checking...</span>
+                        </div>
+                    </li>
+                </ul>
+
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Navigation">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero-section" id="hero">
+            <div class="container hero-grid">
+                <div class="hero-content">
+                    <div class="tag-label">
+                        <span class="tag-pulse"></span>
+                        <span>AI-POWERED URL SECURITY</span>
+                    </div>
+                    <h1 class="hero-title">
+                        One Link Can <br><span class="gradient-text">Change Everything.</span>
+                    </h1>
+                    <p class="hero-sub">
+                        Analyze suspicious URLs with AI-powered threat detection before you decide whether to trust them. Non-invasive static lexical inspection trained on 48,000+ verified links.
+                    </p>
+
+                    <!-- Main URL Scanner -->
+                    <div class="scanner-card" id="scanner">
+                        <label for="urlInput" class="scanner-label">Enter Target Link for Analysis</label>
+                        <form id="scanForm" autocomplete="off">
+                            <div class="input-bar">
+                                <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                </svg>
+                                <input 
+                                    type="text" 
+                                    id="urlInput" 
+                                    class="url-input" 
+                                    placeholder="https://example.com" 
+                                    required 
+                                    spellcheck="false"
+                                    aria-label="URL to scan"
+                                />
+                                <button type="button" class="clear-btn" id="clearBtn" title="Clear input">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                                <button type="submit" class="btn-scan" id="scanBtn">
+                                    <span class="btn-spinner"></span>
+                                    <svg class="btn-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                    <span class="btn-text-default">Analyze URL</span>
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Sample URL Quick Buttons -->
+                        <div class="sample-links-bar">
+                            <span class="sample-links-label">Quick Test:</span>
+                            <button type="button" class="sample-pill safe-pill" onclick="fillAndScan('https://google.com')">
+                                <span class="pill-dot safe"></span> Safe Sample
+                            </button>
+                            <button type="button" class="sample-pill malicious-pill" onclick="fillAndScan('http://110.37.26.193:54956/bin.sh')">
+                                <span class="pill-dot malicious"></span> Malicious IP Sample
+                            </button>
+                            <button type="button" class="sample-pill malicious-pill" onclick="fillAndScan('https://sentry5.obor1shwron8.ru/4ylkytvt')">
+                                <span class="pill-dot malicious"></span> Phishing Sample
+                            </button>
+                        </div>
+
+                        <!-- Error Message Banner -->
+                        <div class="error-banner" id="errorBanner">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <span id="errorMessage"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Desktop Visual Graphic -->
+                <div class="hero-visual">
+                    <div class="shield-graphic-wrap">
+                        <div class="shield-glow-bg"></div>
+                        <div class="radar-ring radar-ring-1"></div>
+                        <div class="radar-ring radar-ring-2"></div>
+                        <svg class="shield-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Results Panel -->
+        <section class="container results-panel" id="resultsPanel" aria-live="polite">
+            <div class="result-card" id="resultCard">
+                <div class="result-header">
+                    <div class="verdict-badge-wrap">
+                        <div class="verdict-badge" id="verdictBadge">
+                            <span id="verdictText">ANALYSIS RESULT</span>
+                        </div>
+                    </div>
+                    <div class="scanned-url-display" id="scannedUrlDisplay"></div>
+                </div>
+
+                <!-- Threat Probability Meter -->
+                <div class="risk-meter-section">
+                    <div class="risk-meter-header">
+                        <span class="risk-meter-label">Model Risk Assessment:</span>
+                        <span class="risk-meter-score" id="riskMeterScore">0%</span>
+                    </div>
+                    <div class="risk-meter-track">
+                        <div class="risk-meter-fill" id="riskMeterFill"></div>
+                    </div>
+                </div>
+
+                <!-- Risk Indicators -->
+                <div class="indicators-section">
+                    <h3 class="indicators-title">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        Detected Structural & Lexical Heuristics:
+                    </h3>
+                    <ul class="indicators-list" id="indicatorsList"></ul>
+                </div>
+
+                <!-- Feature Inspector Accordion -->
+                <div class="features-accordion">
+                    <button type="button" class="features-toggle" id="featuresToggle">
+                        <span>Inspect Extracted Feature Schema (30 Features)</span>
+                        <svg class="chevron-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div class="features-grid" id="featuresGrid"></div>
+                </div>
+
+                <!-- Mandatory Disclaimer -->
+                <div class="disclaimer-box">
+                    <svg class="disclaimer-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>
+                        <strong>Security Disclaimer:</strong> AI-based heuristic screening is not a guarantee of safety. Classification reflects static statistical indicators learned from training datasets. Never open suspicious links to test them.
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="section" id="how-it-works">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-tag">Security Architecture</div>
+                    <h2 class="section-title">How LinkShield AI Works</h2>
+                    <p class="section-desc">A non-invasive, zero-fetch URL inspection pipeline that predicts risk without exposing your machine to threats.</p>
+                </div>
+
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <span class="step-number">01</span>
+                        <div class="step-icon-wrap">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </div>
+                        <h3 class="step-title">1. Submit</h3>
+                        <p class="step-text">Input any target URL. LinkShield AI performs purely static lexical parsing and strictly never fetches, pings, or opens destination servers.</p>
+                    </div>
+
+                    <div class="step-card">
+                        <span class="step-number">02</span>
+                        <div class="step-icon-wrap">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                            </svg>
+                        </div>
+                        <h3 class="step-title">2. Analyze</h3>
+                        <p class="step-text">30 distinct heuristic dimensions (IP indicators, subdomain depth, path length, suspicious keywords, percent-encoding) are evaluated across 100 decision trees.</p>
+                    </div>
+
+                    <div class="step-card">
+                        <span class="step-number">03</span>
+                        <div class="step-icon-wrap">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                        </div>
+                        <h3 class="step-title">3. Review</h3>
+                        <p class="step-text">Receive an instantaneous classification (Safe vs. Malicious), calibrated risk score, and transparent risk factor breakdown to make informed security decisions.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="section" id="about">
+            <div class="container">
+                <div class="about-card">
+                    <div class="section-tag">About The System</div>
+                    <h2 class="section-title" style="margin-bottom: 1.5rem;">Transparent AI Security</h2>
+                    <div class="about-grid">
+                        <div class="about-feature">
+                            <h4 class="about-feature-title">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                                Zero-Fetch Isolation
+                            </h4>
+                            <p class="about-feature-desc">
+                                Many URL scanners trigger active beaconing or drive-by downloads by fetching destination HTML. LinkShield AI relies strictly on static lexical features without ever establishing outbound connections.
+                            </p>
+                        </div>
+                        <div class="about-feature">
+                            <h4 class="about-feature-title">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                                </svg>
+                                Random Forest Model
+                            </h4>
+                            <p class="about-feature-desc">
+                                Trained on 48,812 balanced URLs (URLhaus malware delivery, OpenPhish feeds, and Tranco top verified domains) with a held-out test accuracy of 99.97%.
+                            </p>
+                        </div>
+                        <div class="about-feature">
+                            <h4 class="about-feature-title">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                Real-Time Inference
+                            </h4>
+                            <p class="about-feature-desc">
+                                Feature extraction and inference complete in under 2 milliseconds, making LinkShield AI ideal for instant QR code validation, email link screening, and proxy defenses.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container footer-content">
+                <div class="footer-brand">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                    <span>LinkShield AI</span>
+                    <span class="footer-badge">Prototype</span>
+                </div>
+                <p class="footer-disclaimer">
+                    Built for cybersecurity hackathon demonstration. Designed for preliminary heuristic URL triage.
+                </p>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">
+                    &copy; 2026 LinkShield AI Team. All rights reserved.
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Local JavaScript -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
